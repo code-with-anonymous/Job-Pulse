@@ -1,0 +1,171 @@
+/* ===== JobPulse Global Styles ===== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* Primary palette */
+  --primary-50: #eef2ff;
+  --primary-100: #e0e7ff;
+  --primary-200: #c7d2fe;
+  --primary-300: #a5b4fc;
+  --primary-400: #818cf8;
+  --primary-500: #6366f1;
+  --primary-600: #4f46e5;
+  --primary-700: #4338ca;
+  --primary-800: #3730a3;
+  --primary-900: #312e81;
+
+  /* Accent */
+  --accent-400: #34d399;
+  --accent-500: #10b981;
+  --accent-600: #059669;
+
+  /* Neutral */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+
+  /* Light theme tokens */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+  --border-color: #e2e8f0;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.06);
+  --glass-bg: rgba(255,255,255,0.7);
+  --glass-border: rgba(255,255,255,0.5);
+  --hero-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+  --navbar-bg: rgba(255,255,255,0.85);
+}
+
+[data-theme="dark"] {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-color: #334155;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.4), 0 8px 32px rgba(0,0,0,0.3);
+  --glass-bg: rgba(30,41,59,0.8);
+  --glass-border: rgba(51,65,85,0.5);
+  --hero-gradient: linear-gradient(135deg, #312e81 0%, #4c1d95 50%, #5b21b6 100%);
+  --navbar-bg: rgba(15,23,42,0.85);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb {
+  background: var(--gray-400);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--gray-500); }
+
+/* ===== Ant Design Overrides ===== */
+.ant-btn-primary {
+  background: linear-gradient(135deg, var(--primary-500), var(--primary-600)) !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(99,102,241,0.3) !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, var(--primary-600), var(--primary-700)) !important;
+  box-shadow: 0 4px 16px rgba(99,102,241,0.4) !important;
+  transform: translateY(-1px) !important;
+}
+
+.ant-input, .ant-select-selector, .ant-input-affix-wrapper {
+  border-radius: 10px !important;
+  border-color: var(--border-color) !important;
+  background: var(--bg-secondary) !important;
+  color: var(--text-primary) !important;
+  transition: all 0.3s ease !important;
+}
+.ant-input:focus, .ant-input-focused,
+.ant-input-affix-wrapper:focus, .ant-input-affix-wrapper-focused,
+.ant-select-focused .ant-select-selector {
+  border-color: var(--primary-400) !important;
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12) !important;
+}
+
+.ant-select-dropdown {
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-card-hover) !important;
+  background: var(--bg-card) !important;
+}
+
+.ant-tag {
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+}
+
+[data-theme="dark"] .ant-input,
+[data-theme="dark"] .ant-select-selector,
+[data-theme="dark"] .ant-input-affix-wrapper {
+  background: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .ant-select-dropdown {
+  background: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .ant-select-item {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .ant-select-item-option-active {
+  background: var(--primary-900) !important;
+}
+
+[data-theme="dark"] .ant-form-item-label > label {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .ant-select-selection-placeholder,
+[data-theme="dark"] .ant-input::placeholder {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .ant-empty-description {
+  color: var(--text-muted) !important;
+}
