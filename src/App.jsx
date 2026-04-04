@@ -7,6 +7,17 @@ import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import PreferencesForm from './components/PreferencesForm';
 import Dashboard from './components/Dashboard';
+import JobsTable from './components/JobsTable';
+import { supabase } from "./config/supabase";
+
+const testConnection = async () => {
+  const { data, error } = await supabase.from("jobs").select("*").limit(1);
+
+  console.log("DATA:", data);
+  console.log("ERROR:", error);
+};
+
+testConnection();
 
 function HomePage({ onSaved }) {
   return (
@@ -53,6 +64,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage onSaved={handleSaved} />} />
           <Route path="/dashboard" element={<Dashboard key={refreshKey} />} />
+          <Route path="/jobs" element={<JobsTable />} />
         </Routes>
       </main>
 

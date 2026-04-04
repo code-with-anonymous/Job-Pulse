@@ -28,6 +28,12 @@ export default function Navbar({ theme, toggleTheme }) {
           >
             Dashboard
           </span>
+          <span
+            className={`navbar-link ${location.pathname === '/jobs' ? 'active' : ''}`}
+            onClick={() => navigate('/jobs')}
+          >
+            Jobs
+          </span>
 
           <button
             className="theme-toggle"
