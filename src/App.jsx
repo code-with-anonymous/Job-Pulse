@@ -1,23 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider, theme as antTheme } from 'antd';
 import './App.css';
+
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
 import PreferencesForm from './components/PreferencesForm';
 import Dashboard from './components/Dashboard';
 import JobsTable from './components/JobsTable';
-import { supabase } from "./config/supabase";
 
-const testConnection = async () => {
-  const { data, error } = await supabase.from("jobs").select("*").limit(1);
-
-  console.log("DATA:", data);
-  console.log("ERROR:", error);
-};
-
-testConnection();
+import LoginPage from './components/auth/LoginPage';
+import RegisterPage from './components/auth/RegisterPage';
+import ForgotPasswordPage from './components/auth/ForgotPasswordPage';
 
 function HomePage({ onSaved }) {
   return (
@@ -48,29 +45,48 @@ export default function App() {
   }, []);
 
   return (
-    <ConfigProvider
-      theme={{
-        algorithm: themeMode === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
-        token: {
-          colorPrimary: '#6366f1',
-          borderRadius: 10,
-          fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        },
-      }}
-    >
-      <Navbar theme={themeMode} toggleTheme={toggleTheme} />
+    <AuthProvider>
+      <ConfigProvider
+        theme={{
+          algorithm: themeMode === 'dark' ? antTheme.darkAlgorithm : antTheme.defaultAlgorithm,
+          token: {
+            colorPrimary: '#6366f1',
+            borderRadius: 10,
+            fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+          },
+        }}
+      >
+        <Navbar theme={themeMode} toggleTheme={toggleTheme} />
 
-      <main style={{ flex: 1 }}>
-        <Routes>
-          <Route path="/" element={<HomePage onSaved={handleSaved} />} />
-          <Route path="/dashboard" element={<Dashboard key={refreshKey} />} />
-          <Route path="/jobs" element={<JobsTable />} />
-        </Routes>
-      </main>
+        <main style={{ flex: 1 }}>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/"                 element={<HomePage onSaved={handleSaved} />} />
+            <Route path="/login"            element={<LoginPage />} />
+            <Route path="/register"         element={<RegisterPage />} />
+            <Route path="/forgot-password"  element={<ForgotPasswordPage />} />
 
-      <footer className="footer">
-        Built with ❤️ by <a href="#">JobPulse</a> — Automated Job Alerts for Fresh Graduates
-      </footer>
-    </ConfigProvider>
+            {/* Protected routes */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard key={refreshKey} />
+              </ProtectedRoute>
+            } />
+            <Route path="/jobs" element={
+              <ProtectedRoute>
+                <JobsTable />
+              </ProtectedRoute>
+            } />
+
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+
+        <footer className="footer">
+          Built with ❤️ by <a href="#">JobPulse</a> — Automated Job Alerts for Fresh Graduates
+        </footer>
+      </ConfigProvider>
+    </AuthProvider>
   );
 }

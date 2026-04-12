@@ -13,6 +13,7 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { supabase } from '../config/supabase';
+import { useAuth } from '../context/AuthContext';
 
 /* ─── helpers ─────────────────────────────────────────── */
 function formatDate(str) {
@@ -36,13 +37,15 @@ function StatusBadge({ value }) {
 
 /* ─── Component ───────────────────────────────────────── */
 export default function JobsTable() {
-  const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [search, setSearch] = useState('');
+  const { user } = useAuth();            // ← logged-in user
+  const [jobs, setJobs]             = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [error, setError]           = useState(null);
+  const [search, setSearch]         = useState('');
   const [selectedJob, setSelectedJob] = useState(null);
 
   const fetchJobs = useCallback(async () => {
+    if (!user) return;
     setLoading(true);
     setError(null);
     try {
@@ -51,6 +54,8 @@ export default function JobsTable() {
         .select(
           'id, job_title, company, location, job_url, description, cover_letter, applied_for, sent_to, date, user_email'
         )
+        // Only fetch THIS user's jobs by matching their email
+        .eq('user_email', user.email)
         .order('date', { ascending: false });
 
       if (sbErr) throw sbErr;
@@ -60,7 +65,7 @@ export default function JobsTable() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     fetchJobs();
@@ -87,7 +92,9 @@ export default function JobsTable() {
             Applied Jobs
           </h2>
           <p>
-            {loading ? 'Loading your applications…' : `${filtered.length} job${filtered.length !== 1 ? 's' : ''} found`}
+            {loading
+              ? 'Loading your applications…'
+              : `${filtered.length} job${filtered.length !== 1 ? 's' : ''} found`}
           </p>
         </div>
 
@@ -215,7 +222,7 @@ export default function JobsTable() {
         </div>
       )}
 
-      {/* Detail Modal / Drawer */}
+      {/* Detail Modal */}
       {selectedJob && (
         <div className="jobs-modal-overlay" onClick={() => setSelectedJob(null)}>
           <div
