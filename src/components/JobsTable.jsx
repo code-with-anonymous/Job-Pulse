@@ -11,9 +11,11 @@ import {
   ClockCircleOutlined,
   FileDoneOutlined,
   ExclamationCircleOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import { supabase } from '../config/supabase';
 import { useAuth } from '../context/AuthContext';
+import CoverLetterModal from './CoverLetterModal';
 
 /* ─── helpers ─────────────────────────────────────────── */
 function formatDate(str) {
@@ -43,6 +45,9 @@ export default function JobsTable() {
   const [error, setError]           = useState(null);
   const [search, setSearch]         = useState('');
   const [selectedJob, setSelectedJob] = useState(null);
+
+  // Cover letter modal state
+  const [coverModal, setCoverModal] = useState({ open: false, text: '', info: null });
 
   const fetchJobs = useCallback(async () => {
     if (!user) return;
@@ -176,6 +181,7 @@ export default function JobsTable() {
                 <th><CalendarOutlined /> Date</th>
                 <th>Applied</th>
                 <th>Sent To</th>
+                <th>Cover Letter</th>
                 <th>Link</th>
               </tr>
             </thead>
@@ -200,6 +206,26 @@ export default function JobsTable() {
                     {job.sent_to
                       ? <span><MailOutlined className="td-icon" />{job.sent_to}</span>
                       : '—'}
+                  </td>
+                  <td>
+                    {job.cover_letter ? (
+                      <button
+                        className="cover-letter-view-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCoverModal({
+                            open: true,
+                            text: job.cover_letter,
+                            info: { job_title: job.job_title, company: job.company },
+                          });
+                        }}
+                        id={`view-cover-${job.id}`}
+                      >
+                        <EyeOutlined /> View
+                      </button>
+                    ) : (
+                      <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>—</span>
+                    )}
                   </td>
                   <td>
                     {job.job_url ? (
@@ -273,7 +299,19 @@ export default function JobsTable() {
             {selectedJob.cover_letter && (
               <div className="jobs-modal-section">
                 <h4>Cover Letter</h4>
-                <p>{selectedJob.cover_letter}</p>
+                <button
+                  className="cover-letter-view-btn"
+                  style={{ marginTop: 4 }}
+                  onClick={() => {
+                    setCoverModal({
+                      open: true,
+                      text: selectedJob.cover_letter,
+                      info: { job_title: selectedJob.job_title, company: selectedJob.company },
+                    });
+                  }}
+                >
+                  <EyeOutlined /> View Cover Letter
+                </button>
               </div>
             )}
 
@@ -291,6 +329,14 @@ export default function JobsTable() {
           </div>
         </div>
       )}
+
+      {/* Cover Letter Modal */}
+      <CoverLetterModal
+        open={coverModal.open}
+        onClose={() => setCoverModal({ open: false, text: '', info: null })}
+        coverLetter={coverModal.text}
+        jobInfo={coverModal.info}
+      />
     </section>
   );
 }

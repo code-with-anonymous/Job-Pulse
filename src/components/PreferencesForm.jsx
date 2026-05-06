@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Form, Input, Select, Button, message, Tag } from 'antd';
+import { useState, useEffect } from 'react';
+import { Form, Input, Select, Button, message } from 'antd';
 import {
   CodeOutlined,
   EnvironmentOutlined,
@@ -8,24 +8,49 @@ import {
   SettingOutlined,
   PlusOutlined,
   MailOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
-import { db, collection, addDoc } from '../config/Firebase';
+import { supabase } from '../config/supabase';
+import { useAuth } from '../context/AuthContext';
 
 const JOB_TYPES = [
-  { value: 'full-time', label: '💼  Full-time' },
-  { value: 'part-time', label: '⏰  Part-time' },
-  { value: 'remote', label: '🌍  Remote' },
-  { value: 'internship', label: '🎓  Internship' },
+  { value: 'full-time', label: '💼 Full-time' },
+  { value: 'part-time', label: '⏰ Part-time' },
+  { value: 'remote', label: '🌍 Remote' },
+  { value: 'internship', label: '🎓 Internship' },
 ];
 
+const COUNTRIES = [
+  'Argentina', 'Australia', 'Austria', 'Bahrain', 'Bangladesh', 'Belgium', 'Bulgaria', 'Brazil',
+  'Canada', 'Chile', 'China', 'Colombia', 'Costa Rica', 'Croatia', 'Cyprus', 'Czech Republic',
+  'Denmark', 'Ecuador', 'Egypt', 'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hong Kong',
+  'Hungary', 'India', 'Indonesia', 'Ireland', 'Israel', 'Italy', 'Japan', 'Kuwait', 'Latvia',
+  'Lithuania', 'Luxembourg', 'Malaysia', 'Malta', 'Mexico', 'Morocco', 'Netherlands', 'New Zealand',
+  'Nigeria', 'Norway', 'Oman', 'Pakistan', 'Panama', 'Peru', 'Philippines', 'Poland', 'Portugal',
+  'Qatar', 'Romania', 'Saudi Arabia', 'Singapore', 'Slovakia', 'Slovenia', 'South Africa',
+  'South Korea', 'Spain', 'Sweden', 'Switzerland', 'Taiwan', 'Thailand', 'Turkey', 'Ukraine',
+  'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Venezuela', 'Vietnam'
+].map(c => ({ value: c, label: c }));
+
 export default function PreferencesForm({ onSaved }) {
+  const { user } = useAuth();
+
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [skills, setSkills] = useState([]);
   const [skillInput, setSkillInput] = useState('');
   const [location, setLocation] = useState('');
   const [jobType, setJobType] = useState(undefined);
-  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
+  /* sync auth email */
+  useEffect(() => {
+    if (user?.email) {
+      setEmail(user.email);
+    }
+  }, [user]);
+
+  /* skills */
   const addSkill = (value) => {
     const trimmed = value.trim();
     if (trimmed && !skills.includes(trimmed)) {
@@ -44,198 +69,213 @@ export default function PreferencesForm({ onSaved }) {
     }
   };
 
-  const removeSkill = (skillToRemove) => {
-    setSkills(skills.filter((s) => s !== skillToRemove));
+  const removeSkill = (skill) =>
+    setSkills(skills.filter((s) => s !== skill));
+
+  const resetForm = () => {
+    setName('');
+    setSkills([]);
+    setSkillInput('');
+    setLocation('');
+    setJobType(undefined);
   };
 
+  /* submit */
   const handleSubmit = async () => {
-    // Validation
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      message.error('Please enter a valid email address.');
-      return;
-    }
-    if (skills.length === 0) {
-      message.warning('Please add at least one skill.');
-      return;
-    }
-    if (!location.trim()) {
-      message.warning('Please enter a preferred location.');
-      return;
-    }
-    if (!jobType) {
-      message.warning('Please select a job type.');
-      return;
-    }
-
-    const payload = {
-      email: email.trim(),
-      skills,
-      location: location.trim(),
-      jobType,
-      submittedAt: new Date().toISOString(),
-    };
-
-    setLoading(true);
-    const webhookUrl = "http://localhost:5678/webhook-test/41a43486-6d54-43e1-a053-abbaca3edb58";
-
-    try {
-      console.log("Sending to n8n:", payload);
-
-      // 🔗 Send to n8n webhook
-      const response = await fetch(webhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const result = await response.json();
-      console.log("n8n response:", result);
-
-      // ✅ (Optional) Keep Firebase save
-      const docRef = await addDoc(collection(db, 'jobPreferences'), payload);
-
-      message.success({
-        content: "🎉 Preferences saved & sent to automation!",
-        duration: 4,
-      });
-
-      setSkills([]);
-      setSkillInput('');
-      setLocation('');
-      setJobType(undefined);
-      setEmail('');
-    }
-    catch (error) {
-        console.error('Error saving to Firebase:', error);
-        // Even if Firebase fails, save locally
-        const existing = JSON.parse(localStorage.getItem('jobpulse_prefs') || '[]');
-        existing.unshift(payload);
-        localStorage.setItem('jobpulse_prefs', JSON.stringify(existing));
-        onSaved?.();
-
-        message.success({
-          content: '🎉  Preferences saved locally! Firebase will be configured later.',
-          duration: 4,
-        });
-
-        setSkills([]);
-        setSkillInput('');
-        setLocation('');
-        setJobType(undefined);
-        setEmail('');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    return (
-      <div className="form-section">
-        <div className="form-card">
-          <div className="form-header">
-            <div className="form-header-icon">
-              <SettingOutlined />
-            </div>
-            <h2>Set Your Job Preferences</h2>
-            <p>Tell us what you're looking for and we'll find the best matches.</p>
-          </div>
-
-          <Form layout="vertical" size="large">
-            {/* Email */}
-            <Form.Item
-              label={
-                <span>
-                  <MailOutlined style={{ marginRight: 6 }} />
-                  Email
-                </span>
-              }
-              required
-            >
-              <Input
-                type="email"
-                prefix={<MailOutlined style={{ color: 'var(--text-muted)' }} />}
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </Form.Item>
-
-            {/* Skills tag input */}
-            <Form.Item
-              label={
-                <span>
-                  <CodeOutlined style={{ marginRight: 6 }} />
-                  Skills
-                </span>
-              }
-            >
-              <div className="skill-tags-container" style={{ marginTop: 0, marginBottom: skills.length ? 8 : 0 }}>
-                {skills.map((skill) => (
-                  <span key={skill} className="skill-tag">
-                    {skill}
-                    <CloseOutlined className="close-btn" onClick={() => removeSkill(skill)} />
-                  </span>
-                ))}
-              </div>
-              <Input
-                prefix={<PlusOutlined style={{ color: 'var(--text-muted)' }} />}
-                placeholder="Type a skill and press Enter (e.g., React, Python, SQL)"
-                value={skillInput}
-                onChange={(e) => setSkillInput(e.target.value)}
-                onKeyDown={handleSkillKeyDown}
-                onBlur={() => { if (skillInput.trim()) addSkill(skillInput); }}
-              />
-            </Form.Item>
-
-            {/* Location */}
-            <Form.Item
-              label={
-                <span>
-                  <EnvironmentOutlined style={{ marginRight: 6 }} />
-                  Preferred Location
-                </span>
-              }
-            >
-              <Input
-                prefix={<EnvironmentOutlined style={{ color: 'var(--text-muted)' }} />}
-                placeholder="e.g., Remote, Pakistan, Lahore, New York"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              />
-            </Form.Item>
-
-            {/* Job Type */}
-            <Form.Item
-              label={
-                <span>
-                  <LaptopOutlined style={{ marginRight: 6 }} />
-                  Job Type
-                </span>
-              }
-            >
-              <Select
-                placeholder="Select job type"
-                options={JOB_TYPES}
-                value={jobType}
-                onChange={setJobType}
-                suffixIcon={<LaptopOutlined style={{ color: 'var(--text-muted)' }} />}
-              />
-            </Form.Item>
-
-            {/* Submit */}
-            <Form.Item style={{ marginBottom: 0, marginTop: 8 }}>
-              <Button
-                type="primary"
-                loading={loading}
-                onClick={handleSubmit}
-                block
-              >
-                {loading ? 'Saving Preferences...' : 'Save Preferences'}
-              </Button>
-            </Form.Item>
-          </Form>
-        </div>
-      </div>
-    );
+  if (!user) {
+    message.error('You must be logged in.');
+    return;
   }
+
+  if (!name.trim()) {
+    message.warning('Enter your name.');
+    return;
+  }
+
+  if (!email.trim()) {
+    message.warning('Email missing.');
+    return;
+  }
+
+  if (skills.length === 0) {
+    message.warning('Add at least one skill.');
+    return;
+  }
+
+  if (!location.trim()) {
+    message.warning('Enter location.');
+    return;
+  }
+
+  if (!jobType) {
+    message.warning('Select job type.');
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    /* daily submission check */
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const { data: existing, error: checkError } = await supabase
+      .from('job_preferences')
+      .select('id')
+      .eq('email', email)
+      .gte('created_at', todayStart.toISOString())
+      .lte('created_at', todayEnd.toISOString())
+      .limit(1);
+
+    if (checkError) throw checkError;
+
+    // if (existing?.length > 0) {
+    //   message.error('You already submitted today.');
+    //   setLoading(false);
+    //   return;
+    // }
+
+    /* insert into supabase */
+    const { error: insertError } = await supabase
+      .from('job_preferences')
+      .insert([
+        {
+          name: name.trim(),
+          email: email.trim(),
+          skills: skills.join(', '),
+          location: location.trim(),
+          job_type: jobType,
+          created_at: new Date().toISOString(),
+        },
+      ]);
+
+    if (insertError) throw insertError;
+
+    /* 🔥 TRIGGER WEBHOOK */
+    try {
+      const res = await fetch(`${import.meta.env.VITE_N8N_WEBHOOK_URL}/webhook-test/jobpulse-apply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          skills,
+          location,
+          jobType,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Webhook request failed');
+      }
+
+      const data = await res.json();
+      console.log('Webhook success:', data);
+
+    } catch (webhookError) {
+      // add proper catch for debugging
+      
+      console.error('Webhook error:', webhookError);
+      // 👇 Do NOT block user if webhook fails
+    }
+
+    message.success('Preferences saved successfully!');
+    resetForm();
+    onSaved?.();
+
+  } catch (err) {
+    console.error(err);
+    message.error(err.message || 'Something went wrong');
+  } finally {
+    setLoading(false);
+  }
+};
+
+  return (
+    <div className="form-section">
+      <div className="form-card">
+
+        <div className="form-header">
+          <SettingOutlined />
+          <h2>Set Your Job Preferences</h2>
+        </div>
+
+        <Form layout="vertical" size="large">
+
+          {/* NAME */}
+          <Form.Item label={<span><UserOutlined /> Name</span>}>
+            <Input
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </Form.Item>
+
+          {/* EMAIL */}
+          <Form.Item label={<span><MailOutlined /> Email</span>}>
+            <Input value={email} disabled />
+          </Form.Item>
+
+          {/* SKILLS */}
+          <Form.Item label={<span><CodeOutlined /> Skills</span>}>
+            <div style={{ marginBottom: 8 }}>
+              {skills.map((skill) => (
+                <span key={skill} className="skill-tag">
+                  {skill}
+                  <CloseOutlined onClick={() => removeSkill(skill)} />
+                </span>
+              ))}
+            </div>
+
+            <Input
+              prefix={<PlusOutlined />}
+              placeholder="Add skill"
+              value={skillInput}
+              onChange={(e) => setSkillInput(e.target.value)}
+              onKeyDown={handleSkillKeyDown}
+              onBlur={() => skillInput && addSkill(skillInput)}
+            />
+          </Form.Item>
+
+          {/* LOCATION */}
+          <Form.Item label={<span><EnvironmentOutlined /> Location</span>}>
+            <Select
+              showSearch
+              placeholder="Select your country"
+              value={location || undefined}
+              onChange={(val) => setLocation(val)}
+              options={COUNTRIES}
+              filterOption={(input, option) =>
+                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+              }
+            />
+          </Form.Item>
+
+          {/* JOB TYPE */}
+          <Form.Item label={<span><LaptopOutlined /> Job Type</span>}>
+            <Select
+              options={JOB_TYPES}
+              value={jobType}
+              onChange={setJobType}
+              placeholder="Select job type"
+            />
+          </Form.Item>
+
+          {/* SUBMIT */}
+          <Button
+            type="primary"
+            loading={loading}
+            onClick={handleSubmit}
+            block
+          >
+            Save Preferences
+          </Button>
+
+        </Form>
+      </div>
+    </div>
+  );
+}
