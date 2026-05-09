@@ -1,10 +1,13 @@
 import { SunOutlined, MoonOutlined, ThunderboltOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar({ theme, toggleTheme }) {
   const location      = useLocation();
   const navigate      = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
   const { user, signOut } = useAuth();
 
   const handleLogout = async () => {
@@ -18,31 +21,38 @@ export default function Navbar({ theme, toggleTheme }) {
   return (
     <nav className="navbar">
       <div className="navbar-inner">
-        <div className="navbar-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-          <span className="logo-icon">
-            <ThunderboltOutlined />
-          </span>
-          JobPulse
-        </div>
+        <div className="navbar-left">
+          <div className="navbar-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+              JobPulse
+          </div>
 
-        <div className="navbar-links">
+          <button
+            className={`navbar-burger ${mobileOpen ? 'open' : ''}`}
+            onClick={() => setMobileOpen(v => !v)}
+            aria-label="Toggle navigation"
+            aria-expanded={mobileOpen}
+          >
+            {mobileOpen ? <CloseOutlined /> : <MenuOutlined />}
+          </button>
+
+          <div className="navbar-links">
           {!isAuthPage && (
             <>
               <span
                 className={`navbar-link ${location.pathname === '/' ? 'active' : ''}`}
-                onClick={() => navigate('/')}
+                onClick={() => { navigate('/'); setMobileOpen(false); }}
               >
                 Preferences
               </span>
               <span
                 className={`navbar-link ${location.pathname === '/dashboard' ? 'active' : ''}`}
-                onClick={() => navigate('/dashboard')}
+                onClick={() => { navigate('/dashboard'); setMobileOpen(false); }}
               >
                 Dashboard
               </span>
               <span
                 className={`navbar-link ${location.pathname === '/jobs' ? 'active' : ''}`}
-                onClick={() => navigate('/jobs')}
+                onClick={() => { navigate('/jobs'); setMobileOpen(false); }}
               >
                 Jobs
               </span>
@@ -72,17 +82,50 @@ export default function Navbar({ theme, toggleTheme }) {
           {!user && !isAuthPage && (
             <span
               className="navbar-link navbar-signin-link"
-              onClick={() => navigate('/login')}
+              onClick={() => { navigate('/login'); setMobileOpen(false); }}
             >
               Sign In
             </span>
           )}
 
+          </div>
+        </div>
+
+        <div className="navbar-actions">
           <button
             className="theme-toggle"
             onClick={toggleTheme}
             aria-label="Toggle theme"
           >
+            {theme === 'light' ? <MoonOutlined /> : <SunOutlined />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu - duplicates primary links in a vertical panel on small screens */}
+      <div className={`navbar-mobile ${mobileOpen ? 'open' : ''}`} role="menu">
+        {!isAuthPage && (
+          <>
+            <div className={`navbar-link ${location.pathname === '/' ? 'active' : ''}`} onClick={() => { navigate('/'); setMobileOpen(false); }} role="menuitem">Preferences</div>
+            <div className={`navbar-link ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={() => { navigate('/dashboard'); setMobileOpen(false); }} role="menuitem">Dashboard</div>
+            <div className={`navbar-link ${location.pathname === '/jobs' ? 'active' : ''}`} onClick={() => { navigate('/jobs'); setMobileOpen(false); }} role="menuitem">Jobs</div>
+          </>
+        )}
+
+        {user ? (
+          <div className="navbar-user-mobile">
+            <div className="navbar-avatar" title={user.email}><UserOutlined /></div>
+            <div className="navbar-email">{user.email}</div>
+            <button className="navbar-logout-btn" onClick={() => { handleLogout(); setMobileOpen(false); }}>Sign out</button>
+          </div>
+        ) : (
+          !isAuthPage && (
+            <div className="navbar-link" onClick={() => { navigate('/login'); setMobileOpen(false); }}>Sign In</div>
+          )
+        )}
+
+        <div className="mobile-theme-row">
+          <button className="theme-toggle" onClick={() => { toggleTheme(); }} aria-label="Toggle theme">
             {theme === 'light' ? <MoonOutlined /> : <SunOutlined />}
           </button>
         </div>

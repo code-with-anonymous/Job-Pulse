@@ -196,7 +196,6 @@ export default function Dashboard() {
               <th><EnvironmentOutlined /> Location</th>
               <th><LaptopOutlined /> Job Type</th>
               <th><CalendarOutlined /> Date</th>
-              <th><FileTextOutlined /> Cover Letter</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -228,19 +227,6 @@ export default function Dashboard() {
                     <Tag color={jobInfo.color}>{jobInfo.label}</Tag>
                   </td>
                   <td className="jobs-date">{formatDate(pref.created_at)}</td>
-                  <td>
-                    {pref.cover_letter ? (
-                      <button
-                        className="cover-letter-view-btn"
-                        onClick={() => openCoverLetter(pref)}
-                        id={`view-cover-${pref.id}`}
-                      >
-                        <EyeOutlined /> View Cover Letter
-                      </button>
-                    ) : (
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>—</span>
-                    )}
-                  </td>
                   <td>
                     <Popconfirm
                       title="Delete this preference?"

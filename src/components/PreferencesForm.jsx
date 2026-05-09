@@ -4,9 +4,7 @@ import {
   CodeOutlined,
   EnvironmentOutlined,
   LaptopOutlined,
-  CloseOutlined,
   SettingOutlined,
-  PlusOutlined,
   MailOutlined,
   UserOutlined,
 } from '@ant-design/icons';
@@ -37,8 +35,8 @@ export default function PreferencesForm({ onSaved }) {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [skills, setSkills] = useState([]);
-  const [skillInput, setSkillInput] = useState('');
+  // store skills as a single text string (comma-separated) to match DB
+  const [skillsText, setSkillsText] = useState('');
   const [location, setLocation] = useState('');
   const [jobType, setJobType] = useState(undefined);
   const [loading, setLoading] = useState(false);
@@ -50,32 +48,11 @@ export default function PreferencesForm({ onSaved }) {
     }
   }, [user]);
 
-  /* skills */
-  const addSkill = (value) => {
-    const trimmed = value.trim();
-    if (trimmed && !skills.includes(trimmed)) {
-      setSkills([...skills, trimmed]);
-    }
-    setSkillInput('');
-  };
-
-  const handleSkillKeyDown = (e) => {
-    if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      addSkill(skillInput);
-    }
-    if (e.key === 'Backspace' && !skillInput && skills.length > 0) {
-      setSkills(skills.slice(0, -1));
-    }
-  };
-
-  const removeSkill = (skill) =>
-    setSkills(skills.filter((s) => s !== skill));
+  /* skills as single text */
 
   const resetForm = () => {
     setName('');
-    setSkills([]);
-    setSkillInput('');
+    setSkillsText('');
     setLocation('');
     setJobType(undefined);
   };
@@ -97,7 +74,7 @@ export default function PreferencesForm({ onSaved }) {
     return;
   }
 
-  if (skills.length === 0) {
+  if (!skillsText.trim()) {
     message.warning('Add at least one skill.');
     return;
   }
@@ -145,7 +122,7 @@ export default function PreferencesForm({ onSaved }) {
         {
           name: name.trim(),
           email: email.trim(),
-          skills: skills.join(', '),
+          skills: skillsText.trim(),
           location: location.trim(),
           job_type: jobType,
           created_at: new Date().toISOString(),
@@ -156,13 +133,13 @@ export default function PreferencesForm({ onSaved }) {
 
     /* 🔥 TRIGGER WEBHOOK */
     try {
-      const res = await fetch(`${import.meta.env.VITE_N8N_WEBHOOK_URL}/webhook-test/jobpulse-apply`, {
+      const res = await fetch(`${import.meta.env.VITE_N8N_WEBHOOK_URL}/webhook/jobpulse-apply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
           email: email.trim(),
-          skills,
+          skills: skillsText.trim(),
           location,
           jobType,
         }),
@@ -199,7 +176,6 @@ export default function PreferencesForm({ onSaved }) {
       <div className="form-card">
 
         <div className="form-header">
-          <SettingOutlined />
           <h2>Set Your Job Preferences</h2>
         </div>
 
@@ -221,22 +197,11 @@ export default function PreferencesForm({ onSaved }) {
 
           {/* SKILLS */}
           <Form.Item label={<span><CodeOutlined /> Skills</span>}>
-            <div style={{ marginBottom: 8 }}>
-              {skills.map((skill) => (
-                <span key={skill} className="skill-tag">
-                  {skill}
-                  <CloseOutlined onClick={() => removeSkill(skill)} />
-                </span>
-              ))}
-            </div>
-
-            <Input
-              prefix={<PlusOutlined />}
-              placeholder="Add skill"
-              value={skillInput}
-              onChange={(e) => setSkillInput(e.target.value)}
-              onKeyDown={handleSkillKeyDown}
-              onBlur={() => skillInput && addSkill(skillInput)}
+            <Input.TextArea
+              placeholder="Enter skills as text (e.g., JavaScript, React, Node.js)"
+              value={skillsText}
+              onChange={(e) => setSkillsText(e.target.value)}
+              autoSize={{ minRows: 2, maxRows: 4 }}
             />
           </Form.Item>
 

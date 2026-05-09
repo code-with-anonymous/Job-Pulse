@@ -16,6 +16,7 @@ import {
 import { supabase } from '../config/supabase';
 import { useAuth } from '../context/AuthContext';
 import CoverLetterModal from './CoverLetterModal';
+import ReactMarkdown from "react-markdown";
 
 /* ─── helpers ─────────────────────────────────────────── */
 function formatDate(str) {
@@ -292,7 +293,11 @@ export default function JobsTable() {
             {selectedJob.description && (
               <div className="jobs-modal-section">
                 <h4>Job Description</h4>
-                <p>{selectedJob.description}</p>
+                <div className="job-description">
+                <ReactMarkdown>
+                  {selectedJob.description}
+                </ReactMarkdown>
+              </div>
               </div>
             )}
 
