@@ -1,0 +1,103 @@
+/* ─── Favourite Jobs Page ───────────────────────────── */
+
+.fav-page-section {
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 24px 60px;
+}
+
+/* Page title */
+.fav-page-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin-bottom: 28px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+/* ─── Table wrapper ─────────────────────────────────── */
+.fav-table .ant-table {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(99, 102, 241, 0.08);
+}
+
+.fav-table .ant-table-thead > tr > th {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+  color: #fff !important;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  padding: 14px 18px;
+  border: none !important;
+}
+
+.fav-table .ant-table-tbody > tr > td {
+  padding: 14px 18px;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.08);
+  transition: background 0.18s;
+}
+
+.fav-table .ant-table-tbody > tr:hover > td {
+  background: rgba(99, 102, 241, 0.06) !important;
+}
+
+/* Title cell */
+.fav-title {
+  font-weight: 600;
+  color: var(--text-primary, #1a1a2e);
+}
+
+/* ─── Action buttons in table ───────────────────────── */
+.fav-link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+  font-size: 16px;
+  margin-left: 6px;
+  transition: background 0.2s, transform 0.15s;
+  text-decoration: none;
+}
+
+.fav-link-btn:hover {
+  background: #6366f1;
+  color: #fff;
+  transform: scale(1.08);
+}
+
+/* ─── Loading state ─────────────────────────────────── */
+.fav-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+}
+
+/* ─── Empty state ───────────────────────────────────── */
+.fav-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+  gap: 16px;
+  opacity: 0.75;
+}
+
+/* ─── Dark mode overrides ───────────────────────────── */
+[data-theme="dark"] .fav-title {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .fav-table .ant-table-tbody > tr > td {
+  color: #cbd5e1;
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}

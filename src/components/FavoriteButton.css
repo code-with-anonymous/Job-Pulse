@@ -1,0 +1,7 @@
+/* FavoriteButton styling */
+.favorite-btn {
+  transition: color 0.2s, transform 0.2s;
+}
+.favorite-btn:hover {
+  transform: scale(1.12);
+}

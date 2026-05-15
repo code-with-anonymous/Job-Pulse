@@ -1,4 +1,4 @@
-import { SunOutlined, MoonOutlined, ThunderboltOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons';
+import { SunOutlined, MoonOutlined, ThunderboltOutlined, LogoutOutlined, UserOutlined, HeartOutlined } from '@ant-design/icons';
 import { MenuOutlined, CloseOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -56,6 +56,15 @@ export default function Navbar({ theme, toggleTheme }) {
               >
                 Jobs
               </span>
+              {user && (
+                <span
+                  className={`navbar-link ${location.pathname === '/favorite-jobs' ? 'active' : ''}`}
+                  onClick={() => { navigate('/favorite-jobs'); setMobileOpen(false); }}
+                >
+                  <HeartOutlined style={{ marginRight: 4, color: '#eb2f96' }} />
+                  Favourites
+                </span>
+              )}
             </>
           )}
 
@@ -109,6 +118,11 @@ export default function Navbar({ theme, toggleTheme }) {
             <div className={`navbar-link ${location.pathname === '/' ? 'active' : ''}`} onClick={() => { navigate('/'); setMobileOpen(false); }} role="menuitem">Preferences</div>
             <div className={`navbar-link ${location.pathname === '/dashboard' ? 'active' : ''}`} onClick={() => { navigate('/dashboard'); setMobileOpen(false); }} role="menuitem">Dashboard</div>
             <div className={`navbar-link ${location.pathname === '/jobs' ? 'active' : ''}`} onClick={() => { navigate('/jobs'); setMobileOpen(false); }} role="menuitem">Jobs</div>
+            {user && (
+              <div className={`navbar-link ${location.pathname === '/favorite-jobs' ? 'active' : ''}`} onClick={() => { navigate('/favorite-jobs'); setMobileOpen(false); }} role="menuitem">
+                <HeartOutlined style={{ marginRight: 4, color: '#eb2f96' }} /> Favourites
+              </div>
+            )}
           </>
         )}
 

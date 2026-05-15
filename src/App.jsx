@@ -11,6 +11,7 @@ import HeroSection from './components/HeroSection';
 import PreferencesForm from './components/PreferencesForm';
 import Dashboard from './components/Dashboard';
 import JobsTable from './components/JobsTable';
+import FavoriteJobs from './pages/FavoriteJobs';
 
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
@@ -78,7 +79,11 @@ export default function App() {
               </ProtectedRoute>
             } />
 
-            {/* Fallback */}
+            <Route path="/favorite-jobs" element={
+              <ProtectedRoute>
+                <FavoriteJobs />
+              </ProtectedRoute>
+            } />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>

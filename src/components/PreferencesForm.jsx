@@ -133,8 +133,7 @@ export default function PreferencesForm({ onSaved }) {
 
     /* 🔥 TRIGGER WEBHOOK */
     try {
-      const res = await fetch(`${import.meta.env.VITE_N8N_WEBHOOK_URL}/webhook/jobpulse-apply`, {
-        method: "POST",
+        const res = await fetch(`${import.meta.env.VITE_N8N_WEBHOOK_URL}/webhook/jobpulse-apply`, {        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),

@@ -16,7 +16,78 @@ import {
 import { supabase } from '../config/supabase';
 import { useAuth } from '../context/AuthContext';
 import CoverLetterModal from './CoverLetterModal';
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from 'react-markdown';
+import { FavoriteButton } from './FavoriteButton';
+import remarkGfm from 'remark-gfm';
+
+/* ─── Custom Markdown Components ─────────────────────── */
+const markdownComponents = {
+  // Tables
+  table: ({ children }) => (
+    <div className="md-table-wrap">
+      <table className="md-table">{children}</table>
+    </div>
+  ),
+  thead: ({ children }) => <thead className="md-thead">{children}</thead>,
+  tbody: ({ children }) => <tbody>{children}</tbody>,
+  tr:   ({ children }) => <tr className="md-tr">{children}</tr>,
+  th:   ({ children }) => <th className="md-th">{children}</th>,
+  td:   ({ children }) => <td className="md-td">{children}</td>,
+  // Headings — keep hierarchy but compact
+  h1: ({ children }) => <h2 className="md-h md-h1">{children}</h2>,
+  h2: ({ children }) => <h3 className="md-h md-h2">{children}</h3>,
+  h3: ({ children }) => <h4 className="md-h md-h3">{children}</h4>,
+  h4: ({ children }) => <p  className="md-h md-h4">{children}</p>,
+  // Paragraphs & inline
+  p:      ({ children }) => <p className="md-p">{children}</p>,
+  strong: ({ children }) => <strong className="md-strong">{children}</strong>,
+  em:     ({ children }) => <em className="md-em">{children}</em>,
+  // Lists
+  ul: ({ children }) => <ul className="md-ul">{children}</ul>,
+  ol: ({ children }) => <ol className="md-ol">{children}</ol>,
+  li: ({ children }) => <li className="md-li">{children}</li>,
+  // Code
+  code: ({ inline, children }) =>
+    inline
+      ? <code className="md-code-inline">{children}</code>
+      : <pre className="md-code-block"><code>{children}</code></pre>,
+  // Horizontal rule
+  hr: () => <hr className="md-hr" />,
+};
+
+/* ─── ReadMore Component ──────────────────────────────── */
+const WORD_LIMIT = 100;
+
+function ReadMore({ text }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const words = text.split(/\s+/);
+  const isLong = words.length > WORD_LIMIT;
+  const preview = isLong && !expanded
+    ? words.slice(0, WORD_LIMIT).join(' ') + '…'
+    : text;
+
+  return (
+    <div className="job-description">
+      <div className={`md-content${expanded || !isLong ? '' : ' md-content-collapsed'}`}>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={markdownComponents}
+        >
+          {preview}
+        </ReactMarkdown>
+      </div>
+      {isLong && (
+        <button
+          className="read-more-btn"
+          onClick={() => setExpanded(prev => !prev)}
+        >
+          {expanded ? '↑ Read less' : '↓ Read more'}
+        </button>
+      )}
+    </div>
+  );
+}
 
 /* ─── helpers ─────────────────────────────────────────── */
 function formatDate(str) {
@@ -183,6 +254,7 @@ export default function JobsTable() {
                 <th>Applied</th>
                 <th>Sent To</th>
                 <th>Cover Letter</th>
+                <th>Fav</th>
                 <th>Link</th>
               </tr>
             </thead>
@@ -227,6 +299,9 @@ export default function JobsTable() {
                     ) : (
                       <span style={{ color: 'var(--text-muted)', fontSize: '0.82rem' }}>—</span>
                     )}
+                  </td>
+                  <td onClick={(e) => e.stopPropagation()}>
+                    <FavoriteButton jobId={job.id} />
                   </td>
                   <td>
                     {job.job_url ? (
@@ -293,11 +368,7 @@ export default function JobsTable() {
             {selectedJob.description && (
               <div className="jobs-modal-section">
                 <h4>Job Description</h4>
-                <div className="job-description">
-                <ReactMarkdown>
-                  {selectedJob.description}
-                </ReactMarkdown>
-              </div>
+                <ReadMore text={selectedJob.description} />
               </div>
             )}
 

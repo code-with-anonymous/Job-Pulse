@@ -25,14 +25,14 @@
 }
 
 .navbar-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #6366f1;
-    text-decoration: none;
-    letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #6366f1;
+  text-decoration: none;
+  letter-spacing: -0.5px;
 }
 
 /* Layout helpers for left/center/right */
@@ -1238,9 +1238,6 @@
   color: var(--text-primary);
   white-space: pre-wrap;
   background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 14px 16px;
 }
 
 .jobs-modal-link-btn {
@@ -1890,15 +1887,15 @@
 }
 
 .cover-letter-text {
-    font-family: 'Inter';
-    font-size: 0.95rem;
-    color: #1a1a2e;
-    white-space: pre-wrap;
-    word-break: break-word;
-    margin: 0;
-    letter-spacing: -0.3px;
-    font-style: normal;
-    line-height: 24px;
+  font-family: 'Inter';
+  font-size: 0.95rem;
+  color: #1a1a2e;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+  letter-spacing: -0.3px;
+  font-style: normal;
+  line-height: 24px;
 }
 
 [data-theme="dark"] .cover-letter-text {
@@ -1936,4 +1933,238 @@
   .cover-letter-toolbar {
     padding: 10px 16px;
   }
+}
+
+/* ===================================================
+   JOB DESCRIPTION — Formatted Markdown Display
+   =================================================== */
+
+/* Container that wraps the entire description box */
+.job-description {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+/* Markdown content area */
+.md-content {
+  padding: 18px 20px;
+  font-size: 0.91rem;
+  line-height: 1.75;
+  color: var(--text-primary);
+}
+
+/* Collapsed state — no extra tricks needed since we slice words in JS */
+.md-content-collapsed {
+  /* subtle fade hint at bottom */
+}
+
+/* ── Paragraphs ── */
+.md-p {
+  margin: 0 0 10px 0;
+  color: var(--text-primary);
+  line-height: 1.75;
+}
+
+.md-p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Headings ── */
+.md-h {
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.md-h1 {
+  font-size: 1.1rem;
+  margin: 16px 0 8px;
+}
+
+.md-h2 {
+  font-size: 1rem;
+  margin: 14px 0 6px;
+}
+
+.md-h3 {
+  font-size: 0.95rem;
+  margin: 12px 0 5px;
+}
+
+.md-h4 {
+  font-size: 0.9rem;
+  margin: 10px 0 4px;
+  font-weight: 600;
+}
+
+/* First heading has no top margin */
+.md-content>*:first-child {
+  margin-top: 0 !important;
+}
+
+.md-content>*:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* ── Strong / Em ── */
+.md-strong {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.md-strong+.md-p,
+.md-strong+br {
+  /* ensure a gap after a bolded heading-like line */
+  display: block;
+  margin-top: 2px;
+}
+
+/* ── Lists ── */
+.md-ul,
+.md-ol {
+  margin: 6px 0 10px 0;
+  padding-left: 22px;
+}
+
+.md-li {
+  margin-bottom: 5px;
+  color: var(--text-primary);
+  line-height: 1.65;
+}
+
+/* ── Horizontal rule ── */
+.md-hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 16px 0;
+}
+
+/* ── Inline code ── */
+.md-code-inline {
+  background: var(--primary-50);
+  border: 1px solid var(--primary-100);
+  border-radius: 5px;
+  padding: 1px 6px;
+  font-size: 0.85em;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--primary-600);
+}
+
+[data-theme="dark"] .md-code-inline {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: rgba(99, 102, 241, 0.25);
+  color: var(--primary-300);
+}
+
+/* ── Code block ── */
+.md-code-block {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 14px 16px;
+  overflow-x: auto;
+  font-size: 0.83rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  line-height: 1.6;
+  margin: 10px 0;
+}
+
+/* ── Markdown Table ── */
+.md-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  margin: 14px 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.md-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+  background: var(--bg-card);
+}
+
+/* Sticky header with gradient */
+.md-thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.md-thead .md-tr {
+  background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
+}
+
+.md-th {
+  padding: 11px 16px;
+  text-align: left;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #fff;
+  white-space: nowrap;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.md-td {
+  padding: 10px 16px;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+  line-height: 1.5;
+}
+
+/* Alternating rows */
+.md-table tbody .md-tr:nth-child(even) {
+  background: var(--bg-secondary);
+}
+
+.md-table tbody .md-tr {
+  transition: background 0.15s;
+}
+
+.md-table tbody .md-tr:hover {
+  background: var(--primary-50);
+}
+
+[data-theme="dark"] .md-table tbody .md-tr:hover {
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* Last row no bottom border */
+.md-table tbody .md-tr:last-child .md-td {
+  border-bottom: none;
+}
+
+/* ── Read More Button ── */
+.read-more-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 9px 16px;
+  border: none;
+  border-top: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--primary-500);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.2px;
+}
+
+.read-more-btn:hover {
+  background: var(--primary-50);
+  color: var(--primary-600);
+}
+
+[data-theme="dark"] .read-more-btn:hover {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary-400);
 }
