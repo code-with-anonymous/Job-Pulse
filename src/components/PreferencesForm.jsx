@@ -84,10 +84,7 @@ export default function PreferencesForm({ onSaved }) {
     return;
   }
 
-  if (!jobType) {
-    message.warning('Select job type.');
-    return;
-  }
+  
 
   setLoading(true);
 
@@ -195,7 +192,7 @@ export default function PreferencesForm({ onSaved }) {
           </Form.Item>
 
           {/* SKILLS */}
-          <Form.Item label={<span><CodeOutlined /> Skills</span>}>
+          <Form.Item label={<span><CodeOutlined /> Skill</span>}>
             <Input.TextArea
               placeholder="Enter skills as text (e.g., JavaScript, React, Node.js)"
               value={skillsText}
@@ -229,7 +226,7 @@ export default function PreferencesForm({ onSaved }) {
           </Form.Item>
 
            SUBMIT */}
-           
+
           <Button
             type="primary"
             loading={loading}
