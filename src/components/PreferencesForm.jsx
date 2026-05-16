@@ -121,7 +121,7 @@ export default function PreferencesForm({ onSaved }) {
           email: email.trim(),
           skills: skillsText.trim(),
           location: location.trim(),
-          job_type: "Full-timesss", // hardcoded for now, can be added to form later
+          job_type:  jobType,
           created_at: new Date().toISOString(),
         },
       ]);
@@ -215,7 +215,7 @@ export default function PreferencesForm({ onSaved }) {
             />
           </Form.Item>
 
-          {/* JOB TYPE 
+        
           <Form.Item label={<span><LaptopOutlined /> Job Type</span>}>
             <Select
               options={JOB_TYPES}
@@ -225,7 +225,7 @@ export default function PreferencesForm({ onSaved }) {
             />
           </Form.Item>
 
-           SUBMIT */}
+           
 
           <Button
             type="primary"
