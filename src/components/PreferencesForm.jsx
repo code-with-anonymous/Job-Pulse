@@ -124,7 +124,7 @@ export default function PreferencesForm({ onSaved }) {
           email: email.trim(),
           skills: skillsText.trim(),
           location: location.trim(),
-          job_type: jobType,
+          job_type: "Full-timesss", // hardcoded for now, can be added to form later
           created_at: new Date().toISOString(),
         },
       ]);
@@ -133,14 +133,14 @@ export default function PreferencesForm({ onSaved }) {
 
     /* 🔥 TRIGGER WEBHOOK */
     try {
-        const res = await fetch(`${import.meta.env.VITE_N8N_WEBHOOK_URL}/webhook/jobpulse-apply`, {        method: "POST",
+        const res = await fetch(`${import.meta.env.VITE_N8N_WEBHOOK_URL}/webhook/jobpulse-apply`, {     
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
           email: email.trim(),
           skills: skillsText.trim(),
           location,
-          jobType,
         }),
       });
 
@@ -218,7 +218,7 @@ export default function PreferencesForm({ onSaved }) {
             />
           </Form.Item>
 
-          {/* JOB TYPE */}
+          {/* JOB TYPE 
           <Form.Item label={<span><LaptopOutlined /> Job Type</span>}>
             <Select
               options={JOB_TYPES}
@@ -228,7 +228,8 @@ export default function PreferencesForm({ onSaved }) {
             />
           </Form.Item>
 
-          {/* SUBMIT */}
+           SUBMIT */}
+           
           <Button
             type="primary"
             loading={loading}

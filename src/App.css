@@ -1583,6 +1583,10 @@
   }
 }
 
+.anticon-heart {
+  fill: #6366f1;
+}
+
 /* Switch link */
 .auth-switch {
   text-align: center;
